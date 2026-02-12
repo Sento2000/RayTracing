@@ -20,7 +20,7 @@ public:
 	{
         initialize();
 
-        std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
+        std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
      for (int j = 0; j < image_height; j++) {
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
@@ -82,12 +82,13 @@ private:
     }
 
     color ray_color(const ray& r, int depth,const hittable& world) {
+
         if (depth <= 0)
             return color(0, 0, 0);
         hit_record rec;
         if (world.hit(r, interval(0.0001, infinity), rec))
         {
-            vec3 direction = random_on_hemisphere(rec.normal);
+            vec3 direction = rec.normal + random_unit_vector();
             return 0.5 * ray_color(ray(rec.p, direction),depth-1,world);
         }
         vec3 unit_direction = unit_vector(r.direction());
