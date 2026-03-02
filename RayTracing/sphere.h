@@ -3,14 +3,17 @@
 
 #include "hittable.h"
 #include "vec3.h"
-
+#include "ray.h"
 class sphere :public hittable {
 public:
-    sphere(const point3& center, double radius, shared_ptr<material> mat) : center(center), radius(std::fmax(0, radius)),mat(mat) {
-    }
+    sphere(const point3& static_center, double radius, shared_ptr<material> mat)
+        : center(static_center, vec3(0, 0, 0)), radius(std::fmax(0, radius)), mat(mat) {}
+    sphere(const point3& center1, const point3& center2, double radius, shared_ptr<material> mat)
+        : center(center1, center2 - center1), radius(std::fmax(0, radius)), mat(mat) {}
 	bool hit(const ray& r, interval ray_t, hit_record& rec)const override
 	{
-        vec3 oc = center - r.origin();
+        point3 current_center = center.at(r.time());
+        vec3 oc = current_center - r.origin();
         auto a = dot(r.direction(), r.direction());
         auto h = dot(r.direction(), oc);
         auto c = dot(oc, oc) - radius * radius;
@@ -32,7 +35,7 @@ public:
         }
         rec.t = root;
         rec.p = r.at(rec.t);
-        vec3 outward_normal = (rec.p - center) / radius;
+        vec3 outward_normal = (rec.p - current_center) / radius;
         rec.set_face_normal(r, outward_normal);
         rec.mat = mat;
         return true;
@@ -40,7 +43,7 @@ public:
 
 
 private:
-	point3 center;
+	ray center;
 	double radius;
     shared_ptr<material> mat;
 
