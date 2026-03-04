@@ -3,8 +3,10 @@
 
 #include "ray.h"
 #include "interval.h"
-
+#include "aabb.h"
 class material;
+//核心类 击中结果记录
+//内含参数 ： 交点坐标、法线、时间（也可以说是距离）、前向面判定、材料
 class hit_record {
 public:
 	point3 p;
@@ -23,6 +25,7 @@ class hittable {
 public:
 	virtual ~hittable() = default;
 	virtual bool hit(const ray& r, interval ray_t, hit_record& rec)const = 0;
+	virtual aabb bounding_box() const = 0;
 };
 
 #endif
